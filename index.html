@@ -1,288 +1,659 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LuaForge AI</title>
-
-<style>
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    background: #080b14;
-    color: white;
-    font-family: Arial, sans-serif;
-}
-
-header {
-    padding: 20px;
-    text-align: center;
-    background: #111827;
-    border-bottom: 1px solid #263249;
-}
-
-.logo {
-    font-size: 28px;
-    font-weight: bold;
-    color: #22d3ee;
-}
-
-.logo span {
-    color: #8b5cf6;
-}
-
-main {
-    width: 92%;
-    max-width: 850px;
-    margin: auto;
-}
-
-.hero {
-    text-align: center;
-    padding: 35px 10px;
-}
-
-.hero h1 {
-    font-size: 38px;
-    margin-bottom: 10px;
-}
-
-.hero h1 span {
-    color: #22d3ee;
-}
-
-.hero p {
-    color: #94a3b8;
-}
-
-.card {
-    background: #111827;
-    border: 1px solid #273249;
-    border-radius: 18px;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.card h2 {
-    margin-top: 0;
-}
-
-textarea {
-    width: 100%;
-    min-height: 150px;
-    background: #080d19;
-    color: white;
-    border: 1px solid #273249;
-    border-radius: 12px;
-    padding: 14px;
-    font-size: 15px;
-    resize: vertical;
-}
-
-button {
-    margin-top: 12px;
-    padding: 13px 18px;
-    border: 0;
-    border-radius: 10px;
-    background: linear-gradient(100deg, #8b5cf6, #6366f1);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-button:hover {
-    opacity: 0.85;
-}
-
-.resultado {
-    display: none;
-    margin-top: 15px;
-    padding: 15px;
-    background: #080d19;
-    border-radius: 12px;
-    border: 1px solid #273249;
-}
-
-pre {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-
-.script {
-    padding: 15px;
-    margin-top: 10px;
-    border-radius: 12px;
-    background: #080d19;
-    border: 1px solid #273249;
-}
-
-.chat {
-    position: fixed;
-    right: 18px;
-    bottom: 18px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    font-size: 24px;
-}
-
-footer {
-    text-align: center;
-    color: #64748b;
-    padding: 30px;
-    font-size: 13px;
-}
-
-@media (max-width: 600px) {
-    .hero h1 {
-        font-size: 30px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LuaForge AI</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #080b14;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
     }
-}
-</style>
-</head>
+    header {
+      background: #111827;
+      border-bottom: 1px solid #1e293b;
+      padding: 18px 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .logo {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .logo span { color: #8b5cf6; }
+    .logo .cyan { color: #22d3ee; }
 
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 25px 16px 80px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 30px 10px 40px;
+    }
+    .hero h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .hero h1 span { color: #22d3ee; }
+    .hero p { color: #94a3b8; font-size: 1.05rem; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 22px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .tab {
+      flex-shrink: 0;
+      background: #111827;
+      border: 1px solid #273249;
+      color: #94a3b8;
+      padding: 10px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+    .tab:hover { border-color: #8b5cf6; color: #e2e8f0; }
+    .tab.active {
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      border-color: transparent;
+      color: white;
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card {
+      background: #111827;
+      border: 1px solid #273249;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card p.desc { color: #94a3b8; font-size: 0.95rem; margin-bottom: 16px; }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      background: #080d19;
+      color: #e2e8f0;
+      border: 1px solid #273249;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 15px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    textarea:focus, input:focus {
+      outline: none;
+      border-color: #8b5cf6;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      color: white;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn.secondary {
+      background: #1e293b;
+      border: 1px solid #334155;
+    }
+    .btn.small { padding: 8px 14px; font-size: 0.85rem; margin-top: 8px; }
+
+    .resultado {
+      margin-top: 18px;
+      background: #080d19;
+      border: 1px solid #273249;
+      border-radius: 12px;
+      padding: 16px;
+      display: none;
+    }
+    .resultado.show { display: block; }
+    .resultado pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      color: #a5f3fc;
+    }
+
+    .script-item {
+      background: #080d19;
+      border: 1px solid #273249;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .script-item h4 { margin-bottom: 6px; color: #22d3ee; }
+    .script-item pre {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      max-height: 120px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .chat-box {
+      height: 320px;
+      overflow-y: auto;
+      background: #080d19;
+      border: 1px solid #273249;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+    }
+    .msg.user {
+      align-self: flex-end;
+      background: #4c1d95;
+      color: white;
+    }
+    .msg.bot {
+      align-self: flex-start;
+      background: #1e293b;
+      border: 1px solid #334155;
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 10px;
+    }
+    .chat-input-row input { flex: 1; }
+
+    footer {
+      text-align: center;
+      color: #64748b;
+      padding: 25px;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.7rem; }
+      .tabs { gap: 6px; }
+      .tab { padding: 9px 14px; font-size: 0.88rem; }
+    }
+  </style>
+</head>
 <body>
 
 <header>
-    <div class="logo">
-        LUA<span>FORGE</span> AI
-    </div>
+  <div class="logo">
+    <span class="cyan">LUA</span><span>FORGE</span> AI
+  </div>
 </header>
 
 <main>
-
-<section class="hero">
+  <section class="hero">
     <h1>Crea código <span>Lua</span> con IA</h1>
-    <p>Tu laboratorio de scripts para Roblox Studio.</p>
-</section>
+    <p>Tu laboratorio de scripts para Roblox Studio y executors</p>
+  </section>
 
-<section class="card">
-    <h2>⚡ Generador de scripts</h2>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('generador')">⚡ Generador</button>
+    <button class="tab" onclick="showTab('revisor')">🔍 Revisor</button>
+    <button class="tab" onclick="showTab('biblioteca')">📚 Biblioteca</button>
+    <button class="tab" onclick="showTab('asistente')">🤖 Asistente IA</button>
+  </div>
 
-    <p>
-        Escribe lo que quieres crear:
-    </p>
+  <!-- ==================== GENERADOR ==================== -->
+  <div id="generador" class="panel active">
+    <div class="card">
+      <h2>⚡ Generador de scripts</h2>
+      <p class="desc">Escribe lo que quieres crear. Ejemplo: “botón de salto infinito”, “fly para delta”, “speed hack”, “gui simple”…</p>
 
-    <textarea id="pedido"
-        placeholder="Ejemplo: crea un sistema de doble salto para mi juego..."></textarea>
+      <textarea id="pedido" rows="4" placeholder="Ejemplo: Crea un botón de salto infinito para Delta Executor"></textarea>
 
-    <button onclick="generar()">
-        Generar Script
-    </button>
+      <button class="btn" onclick="generarScript()">Generar Script</button>
+      <button class="btn secondary" onclick="limpiarGenerador()">Limpiar</button>
 
-    <div class="resultado" id="resultadoGenerador">
-        <pre id="respuestaGenerador"></pre>
-
-        <button onclick="copiarGenerado()">
-            Copiar código
-        </button>
+      <div class="resultado" id="resultadoGenerador">
+        <pre id="codigoGenerado"></pre>
+        <button class="btn small" onclick="copiarCodigo('codigoGenerado')">📋 Copiar código</button>
+        <button class="btn small secondary" onclick="guardarEnBiblioteca()">💾 Guardar en Biblioteca</button>
+      </div>
     </div>
-</section>
+  </div>
 
-<section class="card">
+  <!-- ==================== REVISOR ==================== -->
+  <div id="revisor" class="panel">
+    <div class="card">
+      <h2>🔍 Revisor de errores</h2>
+      <p class="desc">Pega tu código Lua y te ayudo a encontrar problemas comunes.</p>
 
-    <h2>🔍 Revisor de errores</h2>
+      <textarea id="codigoRevisar" rows="8" placeholder="Pega aquí tu código Lua..."></textarea>
+      <button class="btn" onclick="revisarCodigo()">Revisar código</button>
 
-    <p>
-        Pega aquí tu código Lua:
-    </p>
-
-    <textarea id="codigo"
-        placeholder="Pega tu código aquí..."></textarea>
-
-    <button onclick="revisar()">
-        Revisar código
-    </button>
-
-    <div class="resultado" id="resultadoRevision">
+      <div class="resultado" id="resultadoRevision">
         <pre id="respuestaRevision"></pre>
+      </div>
     </div>
+  </div>
 
-</section>
-
-<section class="card">
-
-    <h2>📚 Biblioteca</h2>
-
-    <p>
-        Aquí aparecerán tus scripts guardados.
-    </p>
-
-    <div id="biblioteca">
-        <div class="script">
-            Todavía no tienes scripts guardados.
-        </div>
+  <!-- ==================== BIBLIOTECA ==================== -->
+  <div id="biblioteca" class="panel">
+    <div class="card">
+      <h2>📚 Biblioteca de scripts</h2>
+      <p class="desc">Tus scripts guardados (se guardan en este dispositivo).</p>
+      <div id="listaBiblioteca"></div>
+      <button class="btn secondary" onclick="limpiarBiblioteca()" style="margin-top:16px">🗑️ Vaciar biblioteca</button>
     </div>
+  </div>
 
-</section>
+  <!-- ==================== ASISTENTE ==================== -->
+  <div id="asistente" class="panel">
+    <div class="card">
+      <h2>🤖 Asistente IA</h2>
+      <p class="desc">Pregúntame cualquier cosa sobre scripts de Roblox o pídeme que genere uno.</p>
 
+      <div class="chat-box" id="chatBox">
+        <div class="msg bot">¡Hola! Soy el asistente de LuaForge AI. Puedo generarte scripts, explicar código o ayudarte con errores. ¿Qué necesitas?</div>
+      </div>
+
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="Escribe tu mensaje..." onkeydown="if(event.key==='Enter') enviarChat()">
+        <button class="btn" onclick="enviarChat()">Enviar</button>
+      </div>
+    </div>
+  </div>
 </main>
 
-<button class="chat" onclick="abrirChat()">
-    💬
-</button>
-
 <footer>
-    LuaForge AI · Herramienta educativa para Roblox Studio
+  LuaForge AI · Herramienta educativa para Roblox Studio
 </footer>
 
 <script>
+  // ========== TABS ==========
+  function showTab(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+  }
 
-function generar() {
-
-    const pedido = document.getElementById("pedido").value;
-
-    if (pedido.trim() === "") {
-        alert("Primero escribe qué quieres crear.");
-        return;
+  // ========== GENERADOR INTELIGENTE ==========
+  function generarScript() {
+    const pedido = document.getElementById('pedido').value.trim().toLowerCase();
+    if (!pedido) {
+      alert('Escribe primero qué quieres crear.');
+      return;
     }
 
-    document.getElementById("resultadoGenerador").style.display = "block";
+    let codigo = '';
+    let titulo = 'Script generado';
 
-    document.getElementById("respuestaGenerador").textContent =
-        "🤖 La IA estará conectada en el siguiente paso.\n\n" +
-        "Tu solicitud:\n" +
-        pedido;
-}
+    // Detección de palabras clave
+    if (pedido.includes('salto infinito') || pedido.includes('infinite jump') || pedido.includes('inf jump')) {
+      titulo = 'Salto Infinito';
+      codigo = `-- Salto Infinito (funciona en la mayoría de executors)
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
 
-function revisar() {
+local infJump = true
 
-    const codigo = document.getElementById("codigo").value;
+game:GetService("UserInputService").JumpRequest:Connect(function()
+    if infJump and humanoid then
+        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
 
-    if (codigo.trim() === "") {
-        alert("Primero pega un código.");
-        return;
+print("Salto Infinito activado")`;
+    }
+    else if (pedido.includes('fly') || pedido.includes('volar')) {
+      titulo = 'Fly / Volar';
+      codigo = `-- Fly Script (WASD + Space/Ctrl)
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
+
+local flying = false
+local speed = 50
+local bodyGyro, bodyVel
+
+local function startFly()
+    if flying then return end
+    flying = true
+    humanoid.PlatformStand = true
+
+    bodyGyro = Instance.new("BodyGyro")
+    bodyGyro.P = 9e4
+    bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    bodyGyro.CFrame = hrp.CFrame
+    bodyGyro.Parent = hrp
+
+    bodyVel = Instance.new("BodyVelocity")
+    bodyVel.Velocity = Vector3.new(0, 0, 0)
+    bodyVel.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+    bodyVel.Parent = hrp
+
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if not flying then return end
+        local cam = workspace.CurrentCamera
+        local move = Vector3.new()
+        local uis = game:GetService("UserInputService")
+
+        if uis:IsKeyDown(Enum.KeyCode.W) then move = move + cam.CFrame.LookVector end
+        if uis:IsKeyDown(Enum.KeyCode.S) then move = move - cam.CFrame.LookVector end
+        if uis:IsKeyDown(Enum.KeyCode.A) then move = move - cam.CFrame.RightVector end
+        if uis:IsKeyDown(Enum.KeyCode.D) then move = move + cam.CFrame.RightVector end
+        if uis:IsKeyDown(Enum.KeyCode.Space) then move = move + Vector3.new(0, 1, 0) end
+        if uis:IsKeyDown(Enum.KeyCode.LeftControl) then move = move - Vector3.new(0, 1, 0) end
+
+        bodyVel.Velocity = move.Unit * speed
+        bodyGyro.CFrame = cam.CFrame
+    end)
+end
+
+local function stopFly()
+    flying = false
+    humanoid.PlatformStand = false
+    if bodyGyro then bodyGyro:Destroy() end
+    if bodyVel then bodyVel:Destroy() end
+end
+
+-- Toggle con tecla F
+game:GetService("UserInputService").InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.F then
+        if flying then stopFly() else startFly() end
+    end
+end)
+
+print("Fly cargado - Presiona F para activar/desactivar")`;
+    }
+    else if (pedido.includes('speed') || pedido.includes('velocidad') || pedido.includes('walkspeed')) {
+      titulo = 'Speed Hack';
+      codigo = `-- Speed Hack
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local nuevaVelocidad = 50 -- Cambia este número
+
+humanoid.WalkSpeed = nuevaVelocidad
+
+player.CharacterAdded:Connect(function(char)
+    local hum = char:WaitForChild("Humanoid")
+    hum.WalkSpeed = nuevaVelocidad
+end)
+
+print("Speed activado: " .. nuevaVelocidad)`;
+    }
+    else if (pedido.includes('esp') || pedido.includes('wallhack') || pedido.includes('ver jugadores')) {
+      titulo = 'ESP Básico';
+      codigo = `-- ESP simple de jugadores
+local players = game:GetService("Players")
+local localPlayer = players.LocalPlayer
+
+local function createESP(player)
+    if player == localPlayer then return end
+    local character = player.Character
+    if not character then return end
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "ESP"
+    billboard.Adornee = hrp
+    billboard.Size = UDim2.new(0, 100, 0, 40)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = hrp
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = player.Name
+    label.TextColor3 = Color3.fromRGB(0, 255, 128)
+    label.TextStrokeTransparency = 0.5
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 14
+    label.Parent = billboard
+end
+
+for _, p in ipairs(players:GetPlayers()) do
+    createESP(p)
+    p.CharacterAdded:Connect(function()
+        task.wait(1)
+        createESP(p)
+    end)
+end
+
+players.PlayerAdded:Connect(function(p)
+    p.CharacterAdded:Connect(function()
+        task.wait(1)
+        createESP(p)
+    end)
+end)
+
+print("ESP activado")`;
+    }
+    else if (pedido.includes('gui') || pedido.includes('botón') || pedido.includes('boton') || pedido.includes('interfaz')) {
+      titulo = 'GUI Simple + Botón';
+      codigo = `-- GUI simple con botón
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "MiGUI"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 220, 0, 120)
+frame.Position = UDim2.new(0.5, -110, 0.5, -60)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = frame
+
+local titulo = Instance.new("TextLabel")
+titulo.Size = UDim2.new(1, 0, 0, 35)
+titulo.BackgroundTransparency = 1
+titulo.Text = "Mi Script"
+titulo.TextColor3 = Color3.fromRGB(34, 211, 238)
+titulo.Font = Enum.Font.GothamBold
+titulo.TextSize = 18
+titulo.Parent = frame
+
+local boton = Instance.new("TextButton")
+boton.Size = UDim2.new(0.8, 0, 0, 40)
+boton.Position = UDim2.new(0.1, 0, 0.5, 0)
+boton.BackgroundColor3 = Color3.fromRGB(139, 92, 246)
+boton.Text = "Activar"
+boton.TextColor3 = Color3.new(1, 1, 1)
+boton.Font = Enum.Font.GothamBold
+boton.TextSize = 16
+boton.Parent = frame
+
+local botonCorner = Instance.new("UICorner")
+botonCorner.CornerRadius = UDim.new(0, 8)
+botonCorner.Parent = boton
+
+boton.MouseButton1Click:Connect(function()
+    print("¡Botón presionado!")
+    -- Aquí pones la función que quieras
+end)
+
+print("GUI creada")`;
+    }
+    else if (pedido.includes('noclip') || pedido.includes('atravesar')) {
+      titulo = 'Noclip';
+      codigo = `-- Noclip (tecla N para activar/desactivar)
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local noclip = false
+
+game:GetService("RunService").Stepped:Connect(function()
+    if noclip and character then
+        for _, part in ipairs(character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+game:GetService("UserInputService").InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.N then
+        noclip = not noclip
+        print("Noclip: " .. (noclip and "ON" or "OFF"))
+    end
+end)
+
+print("Noclip cargado - Presiona N")`;
+    }
+    else {
+      // Generación genérica
+      titulo = 'Script personalizado';
+      codigo = `-- Script generado para: ${document.getElementById('pedido').value}
+-- Revisa y adapta según necesites
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+-- Aquí puedes empezar a escribir tu lógica
+print("Script iniciado para: ${document.getElementById('pedido').value}")
+
+--[[ 
+Sugerencias:
+- Para movimiento: humanoid.WalkSpeed / JumpPower
+- Para GUI: Instance.new("ScreenGui")
+- Para eventos: game:GetService("UserInputService")
+]]`;
     }
 
-    document.getElementById("resultadoRevision").style.display = "block";
+    document.getElementById('codigoGenerado').textContent = `-- \( {titulo}\n\n \){codigo}`;
+    document.getElementById('resultadoGenerador').classList.add('show');
+  }
 
-    document.getElementById("respuestaRevision").textContent =
-        "🔍 El revisor de IA estará conectado en el siguiente paso.\n\n" +
-        "Código recibido correctamente.";
-}
+  function limpiarGenerador() {
+    document.getElementById('pedido').value = '';
+    document.getElementById('resultadoGenerador').classList.remove('show');
+  }
 
-function copiarGenerado() {
+  function copiarCodigo(id) {
+    const texto = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(texto).then(() => {
+      alert('Código copiado al portapapeles');
+    });
+  }
 
-    const texto =
-        document.getElementById("respuestaGenerador").textContent;
+  // ========== BIBLIOTECA ==========
+  function guardarEnBiblioteca() {
+    const codigo = document.getElementById('codigoGenerado').textContent;
+    if (!codigo) return;
 
-    navigator.clipboard.writeText(texto);
+    const nombre = prompt('Nombre para este script:', 'Mi script');
+    if (!nombre) return;
 
-    alert("Código copiado.");
-}
+    const scripts = JSON.parse(localStorage.getItem('luaforge_scripts') || '[]');
+    scripts.unshift({
+      nombre: nombre,
+      codigo: codigo,
+      fecha: new Date().toLocaleString()
+    });
+    localStorage.setItem('luaforge_scripts', JSON.stringify(scripts));
+    alert('Script guardado en la Biblioteca');
+    cargarBiblioteca();
+  }
 
-function abrirChat() {
+  function cargarBiblioteca() {
+    const contenedor = document.getElementById('listaBiblioteca');
+    const scripts = JSON.parse(localStorage.getItem('luaforge_scripts') || '[]');
 
-    alert(
-        "🤖 El chat de IA lo conectaremos en el siguiente paso."
-    );
+    if (scripts.length === 0) {
+      contenedor.innerHTML = '<div class="script-item"><p style="color:#94a3b8">Todavía no tienes scripts guardados.</p></div>';
+      return;
+    }
 
-}
+    contenedor.innerHTML = scripts.map((s, i) => `
+      <div class="script-item">
+        <h4>${s.nombre}</h4>
+        <small style="color:#64748b">${s.fecha}</small>
+        <pre>${s.codigo.substring(0, 180)}...</pre>
+        <button class="btn small" onclick="copiarDesdeBiblioteca(${i})">📋 Copiar</button>
+        <button class="btn small secondary" onclick="borrarScript(${i})">🗑️ Borrar</button>
+      </div>
+    `).join('');
+  }
 
-</script>
+  function copiarDesdeBiblioteca(index) {
+    const scripts = JSON.parse(localStorage.getItem('luaforge_scripts') || '[]');
+    navigator.clipboard.writeText(scripts[index].codigo);
+    alert('Código copiado');
+  }
 
-</body>
-</html>
+  function borrarScript(index) {
+    const scripts = JSON.parse(localStorage.getItem('luaforge_scripts') || '[]');
+    scripts.splice(index, 1);
+    localStorage.setItem('luaforge_scripts', JSON.stringify(scripts));
+    cargarBiblioteca();
+  }
+
+  function limpiarBiblioteca() {
+    if (confirm('¿Seguro que quieres borrar todos los scripts guardados?')) {
+      localStorage.removeItem('luaforge_scripts');
+      cargarBiblioteca();
+    }
+  }
+
+  // ========== REVISOR ==========
+  function revisarCodigo() {
+    const codigo = document.getElementById('codigoRevisar').value.trim();
+    if (!codigo) {
+      alert('Pega un código primero.');
+      return;
+    }
+
+    let problemas = [];
+    let sugerencias = [];
+
+    if (!codigo.includes('local ') && !codigo.includes('function ')) {
+      problemas.push('No se detectaron variables locales ni funcione

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LuaForge AI</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #080b14;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    padding: 20px;
+    text-align: center;
+    background: #111827;
+    border-bottom: 1px solid #263249;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #22d3ee;
+}
+
+.logo span {
+    color: #8b5cf6;
+}
+
+main {
+    width: 92%;
+    max-width: 850px;
+    margin: auto;
+}
+
+.hero {
+    text-align: center;
+    padding: 35px 10px;
+}
+
+.hero h1 {
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+.hero h1 span {
+    color: #22d3ee;
+}
+
+.hero p {
+    color: #94a3b8;
+}
+
+.card {
+    background: #111827;
+    border: 1px solid #273249;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    margin-top: 0;
+}
+
+textarea {
+    width: 100%;
+    min-height: 150px;
+    background: #080d19;
+    color: white;
+    border: 1px solid #273249;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 15px;
+    resize: vertical;
+}
+
+button {
+    margin-top: 12px;
+    padding: 13px 18px;
+    border: 0;
+    border-radius: 10px;
+    background: linear-gradient(100deg, #8b5cf6, #6366f1);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+.resultado {
+    display: none;
+    margin-top: 15px;
+    padding: 15px;
+    background: #080d19;
+    border-radius: 12px;
+    border: 1px solid #273249;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.script {
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 12px;
+    background: #080d19;
+    border: 1px solid #273249;
+}
+
+.chat {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 24px;
+}
+
+footer {
+    text-align: center;
+    color: #64748b;
+    padding: 30px;
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+    .hero h1 {
+        font-size: 30px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">
+        LUA<span>FORGE</span> AI
+    </div>
+</header>
+
+<main>
+
+<section class="hero">
+    <h1>Crea código <span>Lua</span> con IA</h1>
+    <p>Tu laboratorio de scripts para Roblox Studio.</p>
+</section>
+
+<section class="card">
+    <h2>⚡ Generador de scripts</h2>
+
+    <p>
+        Escribe lo que quieres crear:
+    </p>
+
+    <textarea id="pedido"
+        placeholder="Ejemplo: crea un sistema de doble salto para mi juego..."></textarea>
+
+    <button onclick="generar()">
+        Generar Script
+    </button>
+
+    <div class="resultado" id="resultadoGenerador">
+        <pre id="respuestaGenerador"></pre>
+
+        <button onclick="copiarGenerado()">
+            Copiar código
+        </button>
+    </div>
+</section>
+
+<section class="card">
+
+    <h2>🔍 Revisor de errores</h2>
+
+    <p>
+        Pega aquí tu código Lua:
+    </p>
+
+    <textarea id="codigo"
+        placeholder="Pega tu código aquí..."></textarea>
+
+    <button onclick="revisar()">
+        Revisar código
+    </button>
+
+    <div class="resultado" id="resultadoRevision">
+        <pre id="respuestaRevision"></pre>
+    </div>
+
+</section>
+
+<section class="card">
+
+    <h2>📚 Biblioteca</h2>
+
+    <p>
+        Aquí aparecerán tus scripts guardados.
+    </p>
+
+    <div id="biblioteca">
+        <div class="script">
+            Todavía no tienes scripts guardados.
+        </div>
+    </div>
+
+</section>
+
+</main>
+
+<button class="chat" onclick="abrirChat()">
+    💬
+</button>
+
+<footer>
+    LuaForge AI · Herramienta educativa para Roblox Studio
+</footer>
+
+<script>
+
+function generar() {
+
+    const pedido = document.getElementById("pedido").value;
+
+    if (pedido.trim() === "") {
+        alert("Primero escribe qué quieres crear.");
+        return;
+    }
+
+    document.getElementById("resultadoGenerador").style.display = "block";
+
+    document.getElementById("respuestaGenerador").textContent =
+        "🤖 La IA estará conectada en el siguiente paso.\n\n" +
+        "Tu solicitud:\n" +
+        pedido;
+}
+
+function revisar() {
+
+    const codigo = document.getElementById("codigo").value;
+
+    if (codigo.trim() === "") {
+        alert("Primero pega un código.");
+        return;
+    }
+
+    document.getElementById("resultadoRevision").style.display = "block";
+
+    document.getElementById("respuestaRevision").textContent =
+        "🔍 El revisor de IA estará conectado en el siguiente paso.\n\n" +
+        "Código recibido correctamente.";
+}
+
+function copiarGenerado() {
+
+    const texto =
+        document.getElementById("respuestaGenerador").textContent;
+
+    navigator.clipboard.writeText(texto);
+
+    alert("Código copiado.");
+}
+
+function abrirChat() {
+
+    alert(
+        "🤖 El chat de IA lo conectaremos en el siguiente paso."
+    );
+
+}
+
+</script>
+
+</body>
+</html>
